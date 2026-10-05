@@ -10447,6 +10447,22 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
 .set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
 .set-row .txt .sub { font-size: calc(11.5px + var(--mochi-text-adj, 0px)); }
 .gc-set-row .txt { font-size: calc(14px + var(--mochi-text-adj, 0px)); }
+.sm-tools {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.sm-tools input {
+  flex: 1;
+  padding: 6px 10px;
+}
+.sm-tools button {
+  white-space: nowrap;
+  padding: 6px 14px;
+}
+.cal-card {
+  box-sizing: border-box;
+}
 </style>
 </head>
 <body>
@@ -15149,7 +15165,6 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
           </div>
           <div id="sm-search-results"></div>
           <div id="sm-search-empty" hidden><div style="padding:20px;text-align:center;color:var(--muted);">搜索中...</div></div>
-        </div>
         </div>
       </div>
       <div class="sm-player-bar" id="sm-player-bar" hidden>
