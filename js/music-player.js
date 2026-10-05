@@ -3972,8 +3972,94 @@ if (curTab === 'pl') renderPlaylists();
 if (curTab === 'fav') renderFavList();
 if (curTab === 'favta') renderTaFavList();
 if (curTab === 'his') renderHistory();
+if (curTab === 'search') { const inp = document.getElementById('sm-search-input'); if (inp) setTimeout(() => inp.focus(), 100); }
 });
 });
+const NC_API = 'https://api-enhanced-nine-liard.vercel.app';
+function doSearch(keyword) {
+keyword = String(keyword || '').trim();
+if (!keyword) { toast('先输入歌名或歌手'); return; }
+const box = document.getElementById('sm-search-results');
+const empty = document.getElementById('sm-search-empty');
+if (empty) empty.hidden = true;
+if (box) box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);">搜索中…</div>';
+fetch(NC_API + '/search?keywords=' + encodeURIComponent(keyword) + '&limit=30')
+.then(r => r.json())
+.then(j => {
+const songs = (j && j.result && j.result.songs) || [];
+if (!songs.length) {
+if (box) box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--muted);">没有搜到相关歌曲</div>';
+return;
+}
+renderSearchResults(songs);
+})
+.catch(e => {
+if (box) box.innerHTML = '<div style="padding:20px;text-align:center;color:var(--danger-ink,#a32d2d);">搜索失败：' + esc(e.message || '网络错误') + '</div>';
+});
+}
+function renderSearchResults(songs) {
+const box = document.getElementById('sm-search-results');
+if (!box) return;
+let html = '';
+songs.forEach(s => {
+const sid = String(s.id);
+const name = esc(s.name || '');
+const artist = esc((s.ar || []).map(a => a.name).filter(Boolean).join('/'));
+const album = esc((s.al && s.al.name) || '');
+const cover = (s.al && s.al.picUrl) ? esc(s.al.picUrl.replace(/^http:\/\//i, 'https://')) : '';
+const dur = s.dt ? fmtDur(Math.round(s.dt / 1000)) : '';
+const inLib = library.some(m => m.neteaseId === sid);
+html += '<div class="sm-row" data-sid="' + sid + '" style="display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--line,#eee);cursor:pointer;">' +
+(cover ? '<span class="sm-song-ico has-cov" style="background-image:url(\'' + cover + '\');flex:none;"></span>' : '<span class="sm-song-ico" style="flex:none;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l11-6.5z"/></svg></span>') +
+'<div style="flex:1;min-width:0;">' +
+'<div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + name + (inLib ? ' <span style="font-size:10px;color:var(--muted);font-weight:400;">已在库</span>' : '') + '</div>' +
+'<div style="font-size:12px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + artist + (album ? ' · ' + album : '') + (dur ? ' · ' + dur : '') + '</div>' +
+'</div>' +
+'<button class="cc-tool sm-search-add" data-sid="' + sid + '" style="flex:none;padding:6px 10px;font-size:12px;">' + (inLib ? '播放' : '添加') + '</button>' +
+'</div>';
+});
+box.innerHTML = html;
+box.querySelectorAll('.sm-row').forEach(row => {
+row.addEventListener('click', function (e) {
+const sid = this.dataset.sid;
+const song = songs.find(s => String(s.id) === sid);
+if (!song) return;
+addAndPlay(song);
+});
+});
+box.querySelectorAll('.sm-search-add').forEach(btn => {
+btn.addEventListener('click', function (e) {
+e.stopPropagation();
+const sid = this.dataset.sid;
+const song = songs.find(s => String(s.id) === sid);
+if (!song) return;
+addAndPlay(song);
+});
+});
+}
+function addAndPlay(song) {
+const sid = String(song.id);
+let m = library.find(x => x.neteaseId === sid);
+if (!m) {
+m = {
+id: 'sm_nc_' + sid,
+neteaseId: sid,
+name: song.name || '',
+artist: (song.ar || []).map(a => a.name).filter(Boolean).join('/'),
+cover: (song.al && song.al.picUrl) ? song.al.picUrl.replace(/^http:\/\//i, 'https://') : '',
+url: neteaseMetingUrl(sid),
+source: 'url',
+duration: song.dt ? Math.round(song.dt / 1000) : 0,
+playlistId: 'default',
+addedAt: Date.now()
+};
+library.push(m);
+saveLibrary();
+toast('已添加：' + (song.name || ''));
+}
+playTrack(m.id);
+renderPage();
+}
 const upBtn = document.getElementById('music-upload');
 if (upBtn) upBtn.addEventListener('click', triggerUpload);
 const urlBtn = document.getElementById('music-add-url');
@@ -3986,6 +4072,15 @@ const vipClean = document.getElementById('music-vip-clean');
 if (vipClean) vipClean.addEventListener('click', openVipClean);
 const setBtn = document.getElementById('music-set');
 if (setBtn) setBtn.addEventListener('click', openSettings);
+const searchBtn = document.getElementById('sm-search-btn');
+if (searchBtn) searchBtn.addEventListener('click', () => {
+const inp = document.getElementById('sm-search-input');
+doSearch(inp ? inp.value : '');
+});
+const searchInp = document.getElementById('sm-search-input');
+if (searchInp) searchInp.addEventListener('keydown', (e) => {
+if (e.key === 'Enter') { e.preventDefault(); doSearch(searchInp.value); }
+});
 const playBtn = document.getElementById('sm-play');
 if (playBtn) playBtn.addEventListener('click', () => toggle());
 const modeBtn = document.getElementById('sm-mode');
