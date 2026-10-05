@@ -15101,8 +15101,8 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         <button class="fav-tab" data-mtab="fav">我的收藏</button>
         <!-- v3.14.x：联系人的收藏——标题由 music-player.js syncTaFavTab() 按联系人昵称填充 -->
         <button class="fav-tab" data-mtab="favta">TA的收藏</button>
-        <button class="fav-tab" data-mtab="his">梦角邀请听歌记录</button>
-      </div>
+        <button class="fav-tab" data-mtab="his">梦角邀请听歌记录</button> 
+        <button class="fav-tab" data-mtab="search">搜索</button>
       <div class="cal-scroll sm-scroll">
         <div class="cal-card glass" data-mpanel="lib">
           <div class="sm-tools">
@@ -15140,6 +15140,14 @@ font-family:inherit; padding:4px 2px; cursor:pointer; -webkit-tap-highlight-colo
         </div>
         <div class="cal-card glass" data-mpanel="his" hidden>
           <div id="music-his-list"></div>
+        </div>
+        <div class="cal-card glass" data-mpanel="search" hidden>
+          <div class="sm-tools">
+           <input id="sm-search-input" placeholder="输入歌名/歌手搜索网易云音乐">
+           <button id="sm-search-btn">搜索</button>
+          </div>
+          <div id="sm-search-results"></div>
+          <div id="sm-search-empty" hidden><div style="padding:20px;text-align:center;color:var(--muted);">搜索中...</div></div>
         </div>
       </div>
       <div class="sm-player-bar" id="sm-player-bar" hidden>
@@ -22734,6 +22742,7 @@ window.__mochiBootRetry = function () { try { location.reload(); } catch (e) {} 
        两者都必须存在；构建产物在 </html> 后还会再写一份 __MOCHI_EOF__ 兜底注释。 -->
   <span id="mochi-html-eof" hidden aria-hidden="true"></span>
 <!-- __MOCHI_EOF__ -->
+<script src="./js/music-player.js"></script>
 </body>
 </html>
 <!-- __MOCHI_EOF__ muus5ziu -->
